@@ -23,29 +23,6 @@ function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentConcept, setCurrentConcept] = useState({});
   const toast = useToast();
-  // const conceptList = [
-  //   { id: 1, text: "Buy eggs" },
-  //   { id: 2, text: "Walk the dog" },
-  //   { id: 3, text: "Watch a movie" },
-  // ];
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     //try {
-  //     const result = await axios(config.apiUrl);
-  //     setConcepts(result.data.Items);
-  //     // } catch (err) {
-  //     //   toast({
-  //     //     title: "Error while trying to retrieve concepts",
-  //     //     status: "warning",
-  //     //     duration: 2000,
-  //     //     isClosable: true,
-  //     //   });
-
-  //     return null;
-  //     // }
-  //   };
-  //   fetchData();
-  // }, [toast]);
 
   useEffect(() => {
     async function fetch() {
@@ -54,11 +31,16 @@ function App() {
     }
     fetch();
   }, []);
-  function saveConcept(concept) {
+
+  async function saveConcept(concept) {
     console.log("Save:", concept);
     // Save it to lambda
+    await axios.put(config.apiUrl, concept);
+    // find and replace concept if exist if it does't, then add it
+    const filteredConcepts = concepts.filter((item) => item.id !== concept.id);
+    setConcepts([...filteredConcepts, concept]);
     toast({
-      title: "Saving concept...",
+      title: "Concept saved!",
       status: "info",
       duration: 2000,
       isClosable: true,
@@ -68,25 +50,27 @@ function App() {
     setIsOpen(false);
   }
 
-  function deleteConcept(id) {
-    const newConcepts = concepts.filter((item) => {
-      return item.id !== id;
-    });
-    setConcepts(newConcepts);
-    console.log(newConcepts);
+  async function deleteConcept(id) {
+    if (window.confirm("Are your sure you want to delete this concept?")) {
+      await axios.delete(`${config.apiUrl}/${id}`);
+      const remainingConcepts = concepts.filter((item) => item.id !== id);
+      setConcepts(remainingConcepts);
+      toast({
+        title: "Concept deleted!",
+        status: "info",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   }
 
-  // function AddConceptHandler(newConcepts) {
-  //   setConcepts([...concepts, newConcepts]);
-  // }
-
-  // function saveConcept(id, updatedConcept) {
-  //   const updatedItem = concepts.map((concept) => {
-  //     return concepts.id === id ? updatedConcept : concept;
-  //   });
-  //   setConcepts(updatedItem);
-  // }
-
+  // Get collection of concept display names and ids
+  const conceptList = concepts.map((item) => {
+    return {
+      value: item.id,
+      label: item.displayName,
+    };
+  });
   function onClose() {
     setIsOpen(false);
   }
@@ -96,7 +80,16 @@ function App() {
     setIsOpen(true);
     setCurrentConcept(concept);
   }
+  // const handleCreateItem = (item) => {
+  //   setPickerItems((curr) => [...curr, item]);
+  //   setSelectedItems((curr) => [...curr, item]);
+  // };
 
+  // const handleSelectedItemsChange = (selectedItems) => {
+  //   if (selectedItems) {
+  //     setSelectedItems(selectedItems);
+  //   }
+  // };
   return (
     <AppContext.Provider
       value={{
@@ -155,6 +148,7 @@ function App() {
         isOpen={isOpen}
         onClose={onClose}
         saveConcept={saveConcept}
+        conceptList={conceptList}
       />
     </AppContext.Provider>
   );

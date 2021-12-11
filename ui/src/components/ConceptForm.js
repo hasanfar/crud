@@ -13,29 +13,59 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import isEmpty from "lodash/isEmpty";
+import { nanoid } from "nanoid";
 
 export default function ConceptForm({
   concept = {},
   isOpen,
   onClose,
   saveConcept,
+  conceptList,
 }) {
+  console.log("conceptList: ", conceptList);
   const saveMode = isEmpty(concept) ? "Create" : "Update";
   const [formValues, setFormValues] = useState({});
+  const pickerItems = conceptList.filter((item) => {
+    console.log("---------");
+    console.log("item.id- ", item.id);
+    console.log("Concept ", concept);
+    console.log(
+      "!concept.parentIds?.includes(item) ",
+      !concept.parentIds?.includes(item.id)
+    );
+    console.log(
+      " !concept.childIds?.includes(item) ",
+      !concept.childIds?.includes(item.id)
+    );
+    console.log("item.id !== concept.id ", item.id !== concept.id);
+    return (
+      !concept.parentIds?.includes(item.id) &&
+      !concept.childIds?.includes(item.id) &&
+      item.id !== concept.id
+    );
+  });
+  const [selectedItems, setSelectedItems] = useState([]);
+  const handleSelectedItemsChange = (selectedItems) => {
+    if (selectedItems) {
+      setSelectedItems(selectedItems);
+    }
+  };
+
   useEffect(() => {
     setFormValues({
-      id: concept.id || null,
+      id: concept.id || nanoid(),
       displayName: concept.displayName,
       description: concept.description,
       alternateName: concept.alternateName,
     });
   }, [concept]);
   const inputsHandler = (e) => {
-    setFormValues({ [e.target.name]: e.target.value });
+    setFormValues({ ...formValues, [e.target.name]: e.target.value });
   };
   function submitHandler(e) {
     e.preventDefault();
-    saveConcept(formValues);
+    console.log("saveConcept: ", { ...concept, ...formValues });
+    saveConcept({ ...concept, ...formValues });
   }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

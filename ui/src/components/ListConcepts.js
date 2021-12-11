@@ -1,8 +1,5 @@
 import {
-  HStack,
   VStack,
-  Text,
-  Flex,
   Badge,
   Table,
   Thead,
@@ -10,26 +7,14 @@ import {
   Tr,
   Th,
   Td,
-  //   Modal,
-  //   ModalOverlay,
-  //   ModalContent,
-  //   ModalHeader,
-  //   ModalFooter,
-  //   ModalBody,
-  //   ModalCloseButton,
-  //   Button,
-  //   Input,
 } from "@chakra-ui/react";
 
 // import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react";
-import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import { useTable, useSortBy } from "react-table";
-import { useAppContext } from "../AppContextLib";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import React, { useState } from "react";
-import ConceptForm from "./ConceptForm";
+import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
+import React from "react";
 
 function ListConcepts({ concepts = [], deleteConcept, openConceptForm }) {
+  console.log("inside List: ", concepts);
   return !concepts.length ? (
     <Badge colorScheme="purple" variant="outline" borderRadius="4" p="4" m="5">
       No concepts available to list!!
@@ -39,36 +24,21 @@ function ListConcepts({ concepts = [], deleteConcept, openConceptForm }) {
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>ID</Th>
             <Th>Display Name</Th>
             <Th>Description</Th>
-            <Th>ParentIds</Th>
-            <Th>ChildIds</Th>
             <Th>Alternate Names</Th>
-            <Th>Edit</Th>
+            <Th>View / Edit</Th>
             <Th>Delete</Th>
           </Tr>
         </Thead>
         <Tbody>
           {concepts.map((concept) => (
-            <Tr>
-              <Td>{concept.id}</Td>
-              <Td>{concept.displayName}</Td>
-              <Td>{concept.description}</Td>
-              <Td>{concept.parentIds}</Td>
-              <Td>{concept.childIds}</Td>
-              <Td>{concept.alternateNames}</Td>
-              <Td>
-                <EditIcon onClick={() => openConceptForm({ ...concept })} />
-              </Td>
-              <Td>
-                <DeleteIcon
-                  color="red.500"
-                  mr="2"
-                  onClick={() => deleteConcept(concept.id)}
-                />
-              </Td>
-            </Tr>
+            <ConceptRows
+              concept={concept}
+              key={concept.id}
+              deleteConcept={deleteConcept}
+              openConceptForm={openConceptForm}
+            />
           ))}
         </Tbody>
       </Table>
@@ -76,4 +46,24 @@ function ListConcepts({ concepts = [], deleteConcept, openConceptForm }) {
   );
 }
 
+function ConceptRows({ concept, deleteConcept, openConceptForm }) {
+  console.log("inside row: ", concept);
+  return (
+    <Tr>
+      <Td>{concept.displayName}</Td>
+      <Td>{concept.description}</Td>
+      <Td>{concept.alternateName}</Td>
+      <Td>
+        <ViewIcon onClick={() => openConceptForm({ ...concept })} />
+      </Td>
+      <Td>
+        <DeleteIcon
+          color="red.500"
+          mr="2"
+          onClick={() => deleteConcept(concept.id)}
+        />
+      </Td>
+    </Tr>
+  );
+}
 export default ListConcepts;
