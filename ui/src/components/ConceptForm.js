@@ -90,7 +90,6 @@ export default function ConceptForm({
   }, [concept]);
 
   const inputsHandler = (e) => {
-    alert("[e.target.name]:" + e.target.name + "--" + e.target.value);
     setFormValues({ ...formValues, [e.target.name]: e.target.value });
   };
   function submitHandler(e) {
