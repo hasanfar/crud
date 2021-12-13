@@ -65,7 +65,7 @@ function App() {
   }
 
   // Get collection of concept display names and ids
-  const conceptList = concepts.map((item) => {
+  const conceptOptions = concepts.map((item) => {
     return {
       value: item.id,
       label: item.displayName,
@@ -99,43 +99,20 @@ function App() {
       }}
     >
       <Header />
-      <VStack p={5}>
-        {/* {
-          <Button leftIcon={<AddIcon />} colorScheme="teal" variant="solid">
-            Add Concept
-          </Button>
-        }
-        <Text
-          bgGradient="linear(to-l, #007475,#229389)"
-          bgClip="text"
-          fontSize="2xl"
-          fontWeight="extrabold"
+      <VStack p={5} spacing={"30px"}>
+        {/* <Grid templateColumns="repeat(5, 1fr)" gap={12}>
+          <GridItem colStart={6} colEnd={6} h="10"> */}
+        <Button
+          leftIcon={<AddIcon />}
+          colorScheme="teal"
+          size="sm"
+          variant="solid"
+          onClick={() => openConceptForm({})}
         >
-          Concept List
-        </Text> */}
-        <Grid templateColumns="repeat(5, 1fr)" gap={12}>
-          <GridItem colSpan={2} h="10">
-            <Text
-              bgGradient="linear(to-l, #007475,#229389)"
-              bgClip="text"
-              fontSize="2xl"
-              fontWeight="extrabold"
-            >
-              Concept List
-            </Text>
-          </GridItem>
-          <GridItem colStart={6} colEnd={6} h="10">
-            <Button
-              leftIcon={<AddIcon />}
-              colorScheme="teal"
-              size="sm"
-              variant="solid"
-              onClick={() => openConceptForm({})}
-            >
-              Add
-            </Button>
-          </GridItem>
-        </Grid>
+          Add New Concept
+        </Button>
+        {/* </GridItem>
+        </Grid> */}
         <Divider />
         <ListConcepts
           concepts={concepts}
@@ -148,7 +125,7 @@ function App() {
         isOpen={isOpen}
         onClose={onClose}
         saveConcept={saveConcept}
-        conceptList={conceptList}
+        conceptOptions={conceptOptions}
       />
     </AppContext.Provider>
   );
