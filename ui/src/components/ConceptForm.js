@@ -27,57 +27,41 @@ export default function ConceptForm({
   const [formValues, setFormValues] = useState({});
   const [options, setOptions] = useState([]);
   const [selectedParents, setSelectedParents] = useState([]);
-  const [selectedChild, setSelectedChild] = useState([]);
   const [parentIds, setParentIds] = useState("");
-  const [childIds, setChildIds] = useState("");
 
   useEffect(() => {
     const selectedParentOptions = conceptOptions.filter((co) =>
       concept.parentIds?.split(",").includes(co.value)
     );
-    const selectedChildOptions = conceptOptions.filter((co) =>
-      concept.childIds?.split(",").includes(co.value)
-    );
     setSelectedParents(selectedParentOptions);
-    setSelectedChild(selectedChildOptions);
-  }, [conceptOptions, concept.parentIds, concept.childIds]);
+  }, [conceptOptions, concept.parentIds]);
 
   useEffect(() => {
     setParentIds(selectedParents.map((p) => p.value).join());
-    setChildIds(selectedChild.map((p) => p.value).join());
     setFormValues({
+      ...formValues,
       parentIds: selectedParents.map((p) => p.value).join(),
-      childIds: selectedChild.map((p) => p.value).join(),
     });
-  }, [selectedParents, selectedChild]);
+  }, [selectedParents, formValues]);
 
   useEffect(() => {
     const result = conceptOptions
       .filter((co) => !selectedParents.some((sp) => sp.value === co.value))
-      .filter((co) => !selectedChild.some((sp) => sp.value === co.value))
       .filter((co) => co.value !== concept.id);
     setOptions(result);
-  }, [conceptOptions, selectedParents, selectedChild, concept.id]);
+  }, [conceptOptions, selectedParents, concept.id]);
 
   useEffect(() => {
     setParentIds(selectedParents.map((p) => p.value).join());
-    setChildIds(selectedChild.map((p) => p.value).join());
-  }, [selectedParents, selectedChild]);
+  }, [selectedParents]);
 
   const handleSelectedParentsChange = (selectedItems) => {
     if (selectedItems) {
       setSelectedParents(selectedItems);
       setParentIds(selectedParents.map((p) => p.value).join());
-      setChildIds(selectedChild.map((p) => p.value).join());
     }
   };
-  const handleSelectedChildChange = (selectedItems) => {
-    if (selectedItems) {
-      setSelectedChild(selectedItems);
-      setParentIds(selectedParents.map((p) => p.value).join());
-      setChildIds(selectedChild.map((p) => p.value).join());
-    }
-  };
+
   useEffect(() => {
     setFormValues({
       id: concept.id || nanoid(),
@@ -85,7 +69,6 @@ export default function ConceptForm({
       description: concept.description,
       alternateName: concept.alternateName,
       parentIds: concept.parentIds,
-      childIds: concept.childIds,
     });
   }, [concept]);
 
@@ -94,6 +77,7 @@ export default function ConceptForm({
   };
   function submitHandler(e) {
     e.preventDefault();
+    console.log(formValues);
     saveConcept({ ...concept, ...formValues });
   }
   return (
@@ -108,12 +92,6 @@ export default function ConceptForm({
             <Input
               name="parentIds"
               value={parentIds}
-              onInput={inputsHandler}
-              type="hidden"
-            />
-            <Input
-              name="childIds"
-              value={childIds}
               onInput={inputsHandler}
               type="hidden"
             />
@@ -159,18 +137,6 @@ export default function ConceptForm({
                 selectedItems={selectedParents}
                 onSelectedItemsChange={(changes) =>
                   handleSelectedParentsChange(changes.selectedItems)
-                }
-              />
-            </FormControl>
-            <FormControl id="ChildIds">
-              <CUIAutoComplete
-                label="Child Concepts"
-                placeholder="Type a Concept name"
-                disableCreateItem="true"
-                items={options}
-                selectedItems={selectedChild}
-                onSelectedItemsChange={(changes) =>
-                  handleSelectedChildChange(changes.selectedItems)
                 }
               />
             </FormControl>
